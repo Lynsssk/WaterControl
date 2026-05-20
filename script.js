@@ -90,7 +90,6 @@ if (cadastroForm) {
     cadastroForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
-        // Coleta todos os dados do formulário
         const tipoConta = document.querySelector('input[name="tipoConta"]:checked').value;
         const nome = document.getElementById('nome').value;
         const cnpj = document.getElementById('cnpj').value;
@@ -102,12 +101,22 @@ if (cadastroForm) {
         
         errorMsg.style.display = 'none';
 
-        // 1. Cria a conta de autenticação
+        // --- NOVA TRAVA DE SEGURANÇA (REGEX) ---
+        // Exige: mínimo 8 caracteres, pelo menos 1 letra maiúscula e 1 caractere especial
+        const senhaForteRegex = /^(?=.*[A-Z])(?=.*[!@#$&*]).{8,}$/;
+        
+        if (!senhaForteRegex.test(password)) {
+            errorMsg.style.display = 'block';
+            errorMsg.innerText = "A senha deve ter no mínimo 8 caracteres, uma letra maiúscula e um símbolo (!@#$&*).";
+            return; // O 'return' cancela o cadastro na hora e nem chama o Firebase
+        }
+        // ---------------------------------------
+
+        // 1. Cria a conta de autenticação (só chega aqui se a senha for forte)
         auth.createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
                 const usuario = userCredential.user;
                 
-                // 2. Salva os dados completos no Banco de Dados
                 const database = firebase.database();
                 return database.ref('clientes/' + usuario.uid).set({
                     nome: nome,

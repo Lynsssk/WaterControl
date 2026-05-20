@@ -131,4 +131,9 @@ hr { border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0; }
     .sidebar { width: 100%; padding: 1rem; border-right: none; border-bottom: 1px solid var(--border-color); }
     .main-content { padding: 1rem; }
     .details-grid { grid-template-columns: 1fr; }
+    /* Ajuste para o Logo não vazar na Sidebar */
+.sidebar .logo h2 {
+    font-size: 1.3rem;
+    white-space: nowrap; /* Impede o texto de quebrar ou vazar */
+}
 }
