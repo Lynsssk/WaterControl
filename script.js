@@ -41,27 +41,42 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 // LÓGICA DE LOGIN
 // ==========================================
+// ==========================================
+// LÓGICA DE LOGIN APRIMORADA
+// ==========================================
 const loginForm = document.getElementById('login-form');
+
 if (loginForm) {
     loginForm.addEventListener('submit', (e) => {
         e.preventDefault();
+        
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const errorMsg = document.getElementById('error-message');
         const submitBtn = loginForm.querySelector('button[type="submit"]');
         
-        errorMsg.style.display = 'none';
+        // Proteção: só tenta acessar o estilo se o elemento existir na página
+        if (errorMsg) errorMsg.style.display = 'none';
+
+        // Feedback visual
         const originalText = submitBtn.innerText;
         submitBtn.innerText = "Entrando...";
         submitBtn.disabled = true;
 
         auth.signInWithEmailAndPassword(email, password)
-            .then(() => { window.location.href = "dashboard.html"; })
+            .then(() => { 
+                window.location.href = "dashboard.html"; 
+            })
             .catch((error) => {
                 submitBtn.innerText = originalText;
                 submitBtn.disabled = false;
-                errorMsg.style.display = 'block';
-                errorMsg.innerText = "Erro ao entrar: Verifique e-mail e senha.";
+                
+                if (errorMsg) {
+                    errorMsg.style.display = 'block';
+                    errorMsg.innerText = "E-mail ou senha incorretos.";
+                } else {
+                    alert("Erro ao entrar: E-mail ou senha incorretos.");
+                }
             });
     });
 }
