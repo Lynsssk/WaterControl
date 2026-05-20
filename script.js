@@ -183,6 +183,13 @@ if (window.location.pathname.includes('dashboard.html')) {
     });
 }
 
+// Função de Logout (Certifique-se de que está no seu script.js)
 function fazerLogout() {
-    auth.signOut().then(() => { window.location.href = "login.html"; });
+    auth.signOut().then(() => {
+        // Redireciona para a tela de login após sair
+        window.location.href = "login.html";
+    }).catch((error) => {
+        console.error("Erro ao sair: ", error);
+        alert("Erro ao tentar sair. Tente novamente.");
+    });
 }
