@@ -2,89 +2,178 @@
 // CONFIGURAÇÃO OFICIAL - WATERCONTROL PRO
 // ==========================================
 const firebaseConfig = {
-  apiKey: "AIzaSyACu6wWRDw9r3bJ0tC0U8OcPSk52OTsjQo",
-  authDomain: "watercontrolweb.firebaseapp.com",
-  projectId: "watercontrolweb",
-  storageBucket: "watercontrolweb.firebasestorage.app",
-  messagingSenderId: "54339291903",
-  appId: "1:54339291903:web:3cc86982980912c4ce1aca",
-  databaseURL: "https://watercontrolweb-default-rtdb.firebaseio.com" // Padrão do Realtime Database
+    apiKey: "AIzaSyACu6wWRDw9r3bJ0tC0U8OcPSk52OTsjQo",
+    authDomain: "watercontrolweb.firebaseapp.com",
+    projectId: "watercontrolweb",
+    storageBucket: "watercontrolweb.firebasestorage.app",
+    messagingSenderId: "54339291903",
+    appId: "1:54339291903:web:3cc86982980912c4ce1aca",
+    databaseURL: "https://watercontrolweb-default-rtdb.firebaseio.com"
 };
 
-// Inicializa o Firebase se ele ainda não foi iniciado
 if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
-
 const auth = firebase.auth();
 
 // ==========================================
-// LÓGICA DA TELA DE LOGIN
+// MODO CLARO / ESCURO (THEME TOGGLE)
+// ==========================================
+function toggleTheme() {
+    const body = document.body;
+    body.classList.toggle('light-mode');
+    
+    // Salva a preferência do usuário no navegador
+    if (body.classList.contains('light-mode')) {
+        localStorage.setItem('theme', 'light');
+    } else {
+        localStorage.setItem('theme', 'dark');
+    }
+}
+
+// Aplica o tema salvo ao carregar qualquer página
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+    }
+});
+
+// ==========================================
+// LÓGICA DE LOGIN
 // ==========================================
 const loginForm = document.getElementById('login-form');
 if (loginForm) {
     loginForm.addEventListener('submit', (e) => {
-        e.preventDefault(); // Impede a página de recarregar
-
+        e.preventDefault();
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
-        const errorMessageElement = document.getElementById('error-message');
+        const errorMsg = document.getElementById('error-message');
+        errorMsg.style.display = 'none';
 
-        // Esconde mensagens de erro anteriores
-        errorMessageElement.style.display = 'none';
-
-        // Autenticação no Firebase
         auth.signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                // Sucesso! Vai para o Painel de Controle
-                window.location.href = "dashboard.html";
-            })
+            .then(() => { window.location.href = "dashboard.html"; })
             .catch((error) => {
-                // Tratamento de erros amigável
-                errorMessageElement.style.display = 'block';
-                if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-                    errorMessageElement.innerText = "E-mail ou senha incorretos.";
-                } else if (error.code === 'auth/invalid-email') {
-                    errorMessageElement.innerText = "Formato de e-mail inválido.";
-                } else {
-                    errorMessageElement.innerText = "Erro ao entrar: " + error.message;
-                }
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = "Erro ao entrar: Verifique e-mail e senha.";
             });
     });
 }
 
 // ==========================================
-// SEGURANÇA DA DASHBOARD E LEITURA DO SENSOR
+// LÓGICA DE CADASTRO
+// ==========================================
+// ==========================================
+// LÓGICA DE CADASTRO (COM DADOS COMPLETOS)
+// ==========================================
+
+// Função para mostrar/esconder o CNPJ dependendo do tipo de conta
+const radiosConta = document.querySelectorAll('input[name="tipoConta"]');
+const cnpjGroup = document.getElementById('cnpj-group');
+
+if (radiosConta.length > 0) {
+    radiosConta.forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value === 'empresarial') {
+                cnpjGroup.style.display = 'block';
+                document.getElementById('cnpj').setAttribute('required', 'true');
+            } else {
+                cnpjGroup.style.display = 'none';
+                document.getElementById('cnpj').removeAttribute('required');
+            }
+        });
+    });
+}
+
+const cadastroForm = document.getElementById('cadastro-form');
+if (cadastroForm) {
+    cadastroForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // Coleta todos os dados do formulário
+        const tipoConta = document.querySelector('input[name="tipoConta"]:checked').value;
+        const nome = document.getElementById('nome').value;
+        const cnpj = document.getElementById('cnpj').value;
+        const telefone = document.getElementById('telefone').value;
+        const endereco = document.getElementById('endereco').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorMsg = document.getElementById('error-message');
+        
+        errorMsg.style.display = 'none';
+
+        // 1. Cria a conta de autenticação
+        auth.createUserWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                const usuario = userCredential.user;
+                
+                // 2. Salva os dados completos no Banco de Dados
+                const database = firebase.database();
+                return database.ref('clientes/' + usuario.uid).set({
+                    nome: nome,
+                    tipoConta: tipoConta,
+                    cnpj: tipoConta === 'empresarial' ? cnpj : "N/A",
+                    telefone: telefone,
+                    endereco: endereco,
+                    email: email,
+                    dataCadastro: new Date().toISOString()
+                });
+            })
+            .then(() => { 
+                alert("Conta criada com sucesso! Bem-vindo ao WaterControl Pro.");
+                window.location.href = "dashboard.html"; 
+            })
+            .catch((error) => {
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = "Erro ao criar conta: " + error.message;
+            });
+    });
+}
+// ==========================================
+// LÓGICA DE RECUPERAÇÃO DE SENHA
+// ==========================================
+const recuperarForm = document.getElementById('recuperar-form');
+if (recuperarForm) {
+    recuperarForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const msgBox = document.getElementById('status-message');
+        msgBox.style.display = 'none';
+
+        auth.sendPasswordResetEmail(email)
+            .then(() => {
+                msgBox.style.display = 'block';
+                msgBox.style.color = '#4ade80';
+                msgBox.innerText = "E-mail de redefinição enviado! Verifique sua caixa de entrada.";
+            })
+            .catch((error) => {
+                msgBox.style.display = 'block';
+                msgBox.style.color = '#ff4d4d';
+                msgBox.innerText = "Erro: " + error.message;
+            });
+    });
+}
+
+// ==========================================
+// DASHBOARD E LEITURA DO SENSOR
 // ==========================================
 if (window.location.pathname.includes('dashboard.html')) {
     auth.onAuthStateChanged((user) => {
         if (!user) {
-            // Se tentar burlar a URL sem logar, volta para o login
             window.location.href = "login.html";
         } else {
-            // Usuário validado! Conecta ao banco de dados em tempo real
             const database = firebase.database();
             const nivelRef = database.ref('dispositivos/sensor_01/nivel');
-
-            // Escuta ativa: mudou no sensor, muda no site na mesma hora
             nivelRef.on('value', (snapshot) => {
                 const valor = snapshot.val();
-                if (valor !== null) {
-                    // Executa a função de atualizar a interface que criamos no style/html
-                    if (typeof updateWaterLevel === 'function') {
-                        updateWaterLevel(valor);
-                    }
+                if (valor !== null && typeof updateWaterLevel === 'function') {
+                    updateWaterLevel(valor);
                 }
             });
         }
     });
 }
 
-// ==========================================
-// FUNÇÃO DE LOGOUT (SAIR DO SISTEMA)
-// ==========================================
 function fazerLogout() {
-    auth.signOut().then(() => {
-        window.location.href = "login.html";
-    });
+    auth.signOut().then(() => { window.location.href = "login.html"; });
 }
