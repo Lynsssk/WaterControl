@@ -69,60 +69,122 @@ if (loginForm) {
 
 // Função para mostrar/esconder o CNPJ dependendo do tipo de conta
 // ==========================================
-// 1. LÓGICA DE MOSTRAR/ESCONDER CNPJ
+// ==========================================
+// 1. MOSTRAR/ESCONDER CNPJ
 // ==========================================
 const radiosConta = document.querySelectorAll('input[name="tipoConta"]');
 const cnpjGroup = document.getElementById('cnpj-group');
+const cnpjInput = document.getElementById('cnpj');
 
 if (radiosConta.length > 0) {
     radiosConta.forEach(radio => {
         radio.addEventListener('change', (e) => {
             if (e.target.value === 'empresarial') {
                 cnpjGroup.style.display = 'block';
-                document.getElementById('cnpj').setAttribute('required', 'true');
+                if(cnpjInput) cnpjInput.setAttribute('required', 'true');
             } else {
                 cnpjGroup.style.display = 'none';
-                document.getElementById('cnpj').removeAttribute('required');
+                if(cnpjInput) cnpjInput.removeAttribute('required');
             }
         });
     });
 }
 
 // ==========================================
-// 2. LÓGICA DE FINALIZAR CADASTRO
+// 2. LÓGICA DA SENHA (OLHINHO E CORES VERDES)
+// ==========================================
+const passwordInput = document.getElementById('password');
+const togglePassword = document.getElementById('togglePassword');
+const reqLength = document.getElementById('req-length');
+const reqUpper = document.getElementById('req-upper');
+const reqSymbol = document.getElementById('req-symbol');
+
+// Função de mostrar/ocultar senha
+if (togglePassword && passwordInput) {
+    togglePassword.addEventListener('click', () => {
+        const isPassword = passwordInput.getAttribute('type') === 'password';
+        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+        // Troca o ícone (olho aberto / olho cortado)
+        togglePassword.classList.toggle('fa-eye-slash'); 
+    });
+}
+
+// Função de checar os requisitos em tempo real
+let isPasswordValid = false; // Variável que trava o cadastro se a senha estiver ruim
+
+if (passwordInput) {
+    passwordInput.addEventListener('input', () => {
+        const val = passwordInput.value;
+        let validLength = false;
+        let validUpper = false;
+        let validSymbol = false;
+        
+        // Regra 1: Mínimo 8 caracteres
+        if (val.length >= 8) {
+            reqLength.style.color = '#4ade80'; // Verde
+            reqLength.innerHTML = '<i class="fas fa-check"></i> Mínimo de 8 caracteres';
+            validLength = true;
+        } else {
+            reqLength.style.color = '#ff4d4d'; // Vermelho
+            reqLength.innerHTML = '<i class="fas fa-times"></i> Mínimo de 8 caracteres';
+        }
+
+        // Regra 2: 1 Maiúscula
+        if (/[A-Z]/.test(val)) {
+            reqUpper.style.color = '#4ade80';
+            reqUpper.innerHTML = '<i class="fas fa-check"></i> Pelo menos 1 letra maiúscula';
+            validUpper = true;
+        } else {
+            reqUpper.style.color = '#ff4d4d';
+            reqUpper.innerHTML = '<i class="fas fa-times"></i> Pelo menos 1 letra maiúscula';
+        }
+
+        // Regra 3: 1 Símbolo (!@#$&*)
+        if (/[!@#$&*]/.test(val)) {
+            reqSymbol.style.color = '#4ade80';
+            reqSymbol.innerHTML = '<i class="fas fa-check"></i> Pelo menos 1 símbolo (!@#$&*)';
+            validSymbol = true;
+        } else {
+            reqSymbol.style.color = '#ff4d4d';
+            reqSymbol.innerHTML = '<i class="fas fa-times"></i> Pelo menos 1 símbolo (!@#$&*)';
+        }
+
+        // Se os 3 forem verdadeiros, a senha é válida
+        isPasswordValid = validLength && validUpper && validSymbol;
+    });
+}
+
+// ==========================================
+// 3. FINALIZAR CADASTRO (RESOLVIDO)
 // ==========================================
 const cadastroForm = document.getElementById('cadastro-form');
 
 if (cadastroForm) {
     cadastroForm.addEventListener('submit', (e) => {
-        e.preventDefault(); // Isso impede a página de recarregar (o famoso erro do '?')
+        e.preventDefault(); // Impede o "piscar" e o "?" na URL
         
-        // Coleta os dados digitados
+        const errorMsg = document.getElementById('error-message');
+        errorMsg.style.display = 'none';
+
+        // Checa a variável da senha antes de tentar cadastrar
+        if (!isPasswordValid) {
+            errorMsg.style.display = 'block';
+            errorMsg.innerText = "Por favor, atenda a todos os requisitos da senha (que devem ficar verdes).";
+            return; 
+        }
+
+        // Coleta dados
         const tipoConta = document.querySelector('input[name="tipoConta"]:checked').value;
         const nome = document.getElementById('nome').value;
-        const cnpj = document.getElementById('cnpj').value;
+        const cnpj = cnpjInput ? cnpjInput.value : "N/A";
         const telefone = document.getElementById('telefone').value;
         const endereco = document.getElementById('endereco').value;
         const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-        const errorMsg = document.getElementById('error-message');
-        
-        // Esconde a mensagem de erro toda vez que tenta enviar
-        errorMsg.style.display = 'none';
+        const password = passwordInput.value;
 
-        // --- TRAVA DE SEGURANÇA (SENHA FORTE) ---
-        const senhaForteRegex = /^(?=.*[A-Z])(?=.*[!@#$&*]).{8,}$/;
-        
-        if (!senhaForteRegex.test(password)) {
-            errorMsg.style.display = 'block';
-            errorMsg.innerText = "A senha deve ter no mínimo 8 caracteres, uma letra maiúscula e um símbolo (!@#$&*).";
-            return; // Interrompe o processo aqui mesmo
-        }
-
-        // --- ENVIANDO PARA O FIREBASE ---
+        // Tenta gravar no Firebase
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
-                // Conta criada no Auth! Agora vamos salvar os dados no Banco.
                 const usuario = userCredential.user;
                 const database = firebase.database();
                 
@@ -137,16 +199,13 @@ if (cadastroForm) {
                 });
             })
             .then(() => { 
-                // Tudo deu certo
-                alert("Conta criada com sucesso! Bem-vindo ao WaterControl Pro.");
+                alert("Conta criada com sucesso!");
                 window.location.href = "dashboard.html"; 
             })
             .catch((error) => {
-                // Se der erro (ex: email já existe)
                 errorMsg.style.display = 'block';
-                
                 if (error.code === 'auth/email-already-in-use') {
-                    errorMsg.innerText = "Este e-mail já está cadastrado. Faça login.";
+                    errorMsg.innerText = "Este e-mail já está cadastrado. Tente fazer login.";
                 } else {
                     errorMsg.innerText = "Erro ao criar conta: " + error.message;
                 }

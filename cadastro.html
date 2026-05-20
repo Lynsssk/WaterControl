@@ -48,8 +48,17 @@
                 </div>
 
                 <div class="input-group">
-                    <label>Senha (Mín. 8 caracteres, 1 maiúscula e 1 símbolo)</label>
-                    <input type="password" id="password" required>
+                    <label>Senha</label>
+                    <div style="position: relative;">
+                        <input type="password" id="password" required style="width: 100%; padding-right: 40px; box-sizing: border-box;">
+                        <i class="fas fa-eye" id="togglePassword" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #94a3b8;"></i>
+                    </div>
+                    
+                    <ul id="password-requirements" style="list-style: none; padding: 0; margin-top: 10px; font-size: 0.85rem; color: #ff4d4d; text-align: left;">
+                        <li id="req-length"><i class="fas fa-times"></i> Mínimo de 8 caracteres</li>
+                        <li id="req-upper"><i class="fas fa-times"></i> Pelo menos 1 letra maiúscula</li>
+                        <li id="req-symbol"><i class="fas fa-times"></i> Pelo menos 1 símbolo (!@#$&*)</li>
+                    </ul>
                 </div>
 
                 <button type="submit" class="btn-primary">Finalizar Cadastro</button>
