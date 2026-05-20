@@ -70,13 +70,22 @@ if (loginForm) {
 // Função para mostrar/esconder o CNPJ dependendo do tipo de conta
 // ==========================================
 // ==========================================
-// 1. MOSTRAR/ESCONDER CNPJ
-// ==========================================
-const radiosConta = document.querySelectorAll('input[name="tipoConta"]');
-const cnpjGroup = document.getElementById('cnpj-group');
-const cnpjInput = document.getElementById('cnpj');
+// Espera o HTML carregar completamente antes de rodar qualquer coisa
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // Verifica se estamos na página de cadastro
+    const cadastroForm = document.getElementById('cadastro-form');
+    
+    // Se o formulário não existir nesta página, o script para aqui e não dá erro
+    if (!cadastroForm) return; 
 
-if (radiosConta.length > 0) {
+    // ==========================================
+    // 1. MOSTRAR/ESCONDER CNPJ
+    // ==========================================
+    const radiosConta = document.querySelectorAll('input[name="tipoConta"]');
+    const cnpjGroup = document.getElementById('cnpj-group');
+    const cnpjInput = document.getElementById('cnpj');
+
     radiosConta.forEach(radio => {
         radio.addEventListener('change', (e) => {
             if (e.target.value === 'empresarial') {
@@ -88,92 +97,64 @@ if (radiosConta.length > 0) {
             }
         });
     });
-}
 
-// ==========================================
-// 2. LÓGICA DA SENHA (OLHINHO E CORES VERDES)
-// ==========================================
-const passwordInput = document.getElementById('password');
-const togglePassword = document.getElementById('togglePassword');
-const reqLength = document.getElementById('req-length');
-const reqUpper = document.getElementById('req-upper');
-const reqSymbol = document.getElementById('req-symbol');
+    // ==========================================
+    // 2. LÓGICA DA SENHA (OLHINHO E CORES)
+    // ==========================================
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+    const reqLength = document.getElementById('req-length');
+    const reqUpper = document.getElementById('req-upper');
+    const reqSymbol = document.getElementById('req-symbol');
+    const reqNumber = document.getElementById('req-number'); // Novo requisito
 
-// Função de mostrar/ocultar senha
-if (togglePassword && passwordInput) {
+    // Olhinho
     togglePassword.addEventListener('click', () => {
-        const isPassword = passwordInput.getAttribute('type') === 'password';
-        passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
-        // Troca o ícone (olho aberto / olho cortado)
-        togglePassword.classList.toggle('fa-eye-slash'); 
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        togglePassword.classList.toggle('fa-eye-slash');
     });
-}
 
-// Função de checar os requisitos em tempo real
-let isPasswordValid = false; // Variável que trava o cadastro se a senha estiver ruim
+    // Checagem em tempo real
+    let isPasswordValid = false;
 
-if (passwordInput) {
     passwordInput.addEventListener('input', () => {
         const val = passwordInput.value;
-        let validLength = false;
-        let validUpper = false;
-        let validSymbol = false;
         
-        // Regra 1: Mínimo 8 caracteres
-        if (val.length >= 8) {
-            reqLength.style.color = '#4ade80'; // Verde
-            reqLength.innerHTML = '<i class="fas fa-check"></i> Mínimo de 8 caracteres';
-            validLength = true;
-        } else {
-            reqLength.style.color = '#ff4d4d'; // Vermelho
-            reqLength.innerHTML = '<i class="fas fa-times"></i> Mínimo de 8 caracteres';
-        }
+        const validLength = val.length >= 8;
+        const validUpper = /[A-Z]/.test(val);
+        const validSymbol = /[!@#$&*]/.test(val);
+        const validNumber = /[0-9]/.test(val); // Verifica se tem número
 
-        // Regra 2: 1 Maiúscula
-        if (/[A-Z]/.test(val)) {
-            reqUpper.style.color = '#4ade80';
-            reqUpper.innerHTML = '<i class="fas fa-check"></i> Pelo menos 1 letra maiúscula';
-            validUpper = true;
-        } else {
-            reqUpper.style.color = '#ff4d4d';
-            reqUpper.innerHTML = '<i class="fas fa-times"></i> Pelo menos 1 letra maiúscula';
-        }
+        // Atualiza a interface
+        const updateReq = (element, isValid, text) => {
+            element.style.color = isValid ? '#4ade80' : '#ff4d4d';
+            element.innerHTML = isValid ? `<i class="fas fa-check"></i> ${text}` : `<i class="fas fa-times"></i> ${text}`;
+        };
 
-        // Regra 3: 1 Símbolo (!@#$&*)
-        if (/[!@#$&*]/.test(val)) {
-            reqSymbol.style.color = '#4ade80';
-            reqSymbol.innerHTML = '<i class="fas fa-check"></i> Pelo menos 1 símbolo (!@#$&*)';
-            validSymbol = true;
-        } else {
-            reqSymbol.style.color = '#ff4d4d';
-            reqSymbol.innerHTML = '<i class="fas fa-times"></i> Pelo menos 1 símbolo (!@#$&*)';
-        }
+        updateReq(reqLength, validLength, 'Mínimo de 8 caracteres');
+        updateReq(reqUpper, validUpper, 'Pelo menos 1 letra maiúscula');
+        updateReq(reqSymbol, validSymbol, 'Pelo menos 1 símbolo (!@#$&*)');
+        updateReq(reqNumber, validNumber, 'Pelo menos 1 número');
 
-        // Se os 3 forem verdadeiros, a senha é válida
-        isPasswordValid = validLength && validUpper && validSymbol;
+        isPasswordValid = validLength && validUpper && validSymbol && validNumber;
     });
-}
 
-// ==========================================
-// 3. FINALIZAR CADASTRO (RESOLVIDO)
-// ==========================================
-const cadastroForm = document.getElementById('cadastro-form');
-
-if (cadastroForm) {
+    // ==========================================
+    // 3. FINALIZAR CADASTRO
+    // ==========================================
     cadastroForm.addEventListener('submit', (e) => {
-        e.preventDefault(); // Impede o "piscar" e o "?" na URL
+        e.preventDefault(); 
         
         const errorMsg = document.getElementById('error-message');
         errorMsg.style.display = 'none';
 
-        // Checa a variável da senha antes de tentar cadastrar
         if (!isPasswordValid) {
             errorMsg.style.display = 'block';
-            errorMsg.innerText = "Por favor, atenda a todos os requisitos da senha (que devem ficar verdes).";
+            errorMsg.innerText = "Sua senha precisa atender a todos os requisitos (ficar tudo verde).";
             return; 
         }
 
-        // Coleta dados
         const tipoConta = document.querySelector('input[name="tipoConta"]:checked').value;
         const nome = document.getElementById('nome').value;
         const cnpj = cnpjInput ? cnpjInput.value : "N/A";
@@ -182,13 +163,11 @@ if (cadastroForm) {
         const email = document.getElementById('email').value;
         const password = passwordInput.value;
 
-        // Tenta gravar no Firebase
+        // Cadastro Firebase
         firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
                 const usuario = userCredential.user;
-                const database = firebase.database();
-                
-                return database.ref('clientes/' + usuario.uid).set({
+                return firebase.database().ref('clientes/' + usuario.uid).set({
                     nome: nome,
                     tipoConta: tipoConta,
                     cnpj: tipoConta === 'empresarial' ? cnpj : "N/A",
@@ -207,11 +186,11 @@ if (cadastroForm) {
                 if (error.code === 'auth/email-already-in-use') {
                     errorMsg.innerText = "Este e-mail já está cadastrado. Tente fazer login.";
                 } else {
-                    errorMsg.innerText = "Erro ao criar conta: " + error.message;
+                    errorMsg.innerText = "Erro: " + error.message;
                 }
             });
     });
-}
+});
 // ==========================================
 // LÓGICA DE RECUPERAÇÃO DE SENHA
 // ==========================================
