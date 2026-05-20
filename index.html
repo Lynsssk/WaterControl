@@ -3,25 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WaterControl Pro | Monitoramento Inteligente</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>WaterControl Pro | Monitoramento Inteligente de Água</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <nav class="navbar">
         <div class="logo">Water<span>Control</span> Pro</div>
+        <div class="nav-links">
+            <a href="#funcionalidades">Funcionalidades</a>
+            <a href="#planos">Planos</a>
+        </div>
         <a href="login.html" class="btn-primary">Acessar Painel</a>
     </nav>
 
     <header class="hero">
+        <span class="badge">Tecnologia IoT Avançada</span>
         <h1>O fim das surpresas com a falta de água.</h1>
-        <p>Monitore o nível do seu reservatório em tempo real, receba alertas inteligentes e tenha controle total na palma da sua mão. Tecnologia IoT para sua casa e sua comunidade.</p>
-        
+        <p>Monitore o nível do seu reservatório em tempo real, preveja escassezes e receba alertas inteligentes direto no seu celular. A solução perfeita para residências, condomínios e grandes empresas.</p>
         <div class="hero-actions">
-            <a href="login.html" class="btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">Começar Agora</a>
+            <a href="#planos" class="btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">Escolha seu Plano</a>
+            <a href="#funcionalidades" class="btn-secondary">Saber Mais <i class="fas fa-arrow-right"></i></a>
         </div>
     </header>
+
+    <section class="section-container" id="funcionalidades">
+        <div class="section-header">
+            <h2>Por que escolher o WaterControl Pro?</h2>
+            <p>Unimos hardware de ponta e software intuitivo para te dar controle absoluto.</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="icon-box"><i class="fas fa-satellite-dish"></i></div>
+                <h3>Monitoramento Ultra-preciso</h3>
+                <p>Nosso sensor NodeMCU ESP8266 mede o nível com precisão milimétrica, atualizando seu painel a cada segundo via Wi-Fi.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="icon-box"><i class="fas fa-bell"></i></div>
+                <h3>Alertas Inteligentes</h3>
+                <p>Seja notificado imediatamente quando o nível atingir patamares críticos (como menos de 20%) para evitar o desabastecimento.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="icon-box"><i class="fas fa-chart-pie"></i></div>
+                <h3>Análise de Consumo</h3>
+                <p>Gráficos interativos que mostram sua média diária e semanal de consumo, ajudando a identificar vazamentos ocultos e economizar na conta.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-container" id="planos" style="background: rgba(255,255,255,0.01); border-top: 1px solid rgba(255,255,255,0.02);">
+        <div class="section-header">
+            <h2>Planos sob medida para sua necessidade</h2>
+            <p>Seja para a sua casa ou para gerenciar a distribuição de um complexo industrial.</p>
+        </div>
+
+        <div class="pricing-grid">
+            <div class="price-card">
+                <h3>Residencial</h3>
+                <div class="price">R$ 19,<span>90</span><small>/mês</small></div>
+                <p class="plan-desc">Ideal para casas e pequenos negócios.</p>
+                <hr>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> 1 Ponto de monitoramento</li>
+                    <li><i class="fas fa-check"></i> Alertas em tempo real no site</li>
+                    <li><i class="fas fa-check"></i> Histórico básico de 7 dias</li>
+                    <li><i class="fas fa-check"></i> Suporte via e-mail</li>
+                </ul>
+                <a href="login.html" class="btn-plan">Assinar Agora</a>
+            </div>
+
+            <div class="price-card featured">
+                <span class="card-badge">Mais Vendido</span>
+                <h3>Condomínios</h3>
+                <div class="price">R$ 79,<span>90</span><small>/mês</small></div>
+                <p class="plan-desc">Perfeito para prédios residenciais ou comerciais.</p>
+                <hr>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> Até 5 Pontos de monitoramento</li>
+                    <li><i class="fas fa-check"></i> Alertas via WhatsApp/SMS</li>
+                    <li><i class="fas fa-check"></i> Relatórios integrados por bloco</li>
+                    <li><i class="fas fa-check"></i> Histórico completo de 30 dias</li>
+                    <li><i class="fas fa-check"></i> Suporte prioritário 12h</li>
+                </ul>
+                <a href="login.html" class="btn-primary" style="display: block; text-align: center; margin-top: 2rem;">Contratar Plano</a>
+            </div>
+
+            <div class="price-card">
+                <h3>Corporativo</h3>
+                <div class="price">R$ 200,<span>00</span><small>/mês</small></div>
+                <p class="plan-desc">Para indústrias e empresas de grande porte.</p>
+                <hr>
+                <ul class="plan-features">
+                    <li><i class="fas fa-check"></i> Sensores Ilimitados</li>
+                    <li><i class="fas fa-check"></i> Integração via API do Sistema</li>
+                    <li><i class="fas fa-check"></i> Painel multi-unidades unificado</li>
+                    <li><i class="fas fa-check"></i> Histórico anual de dados</li>
+                    <li><i class="fas fa-check"></i> Gerente de contas e Suporte 24/7</li>
+                </ul>
+                <a href="login.html" class="btn-plan">Falar com Consultor</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="main-footer">
+        <p>&copy; 2026 WaterControl Pro. Todos os direitos reservados.</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">Desenvolvido com excelência técnica por Lyne.</p>
+    </footer>
 
 </body>
 </html>

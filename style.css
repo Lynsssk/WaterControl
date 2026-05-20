@@ -1,150 +1,196 @@
-/* Reset Global */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-}
-
-:root {
-    --bg-dark: #020617;
-    --card-bg: #0f172a;
-    --accent-blue: #3b82f6;
-    --accent-hover: #2563eb;
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
-}
-
-body {
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    line-height: 1.6;
-    overflow-x: hidden;
-}
-
-/* Navbar da Landing Page */
-.navbar {
+/* Links de Navegação adicionais */
+.nav-links {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 5%;
-    background: rgba(2, 6, 23, 0.8);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    gap: 2rem;
 }
 
-.logo {
-    font-size: 1.5rem;
-    font-weight: bold;
+.nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
 }
 
-.logo span {
+.nav-links a:hover {
+    color: var(--text-main);
+}
+
+/* Badges e Botões Secundários */
+.badge {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--accent-blue);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.btn-secondary {
+    color: var(--text-main);
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 1.5rem;
+    transition: 0.3s;
+}
+
+.btn-secondary:hover {
     color: var(--accent-blue);
 }
 
-.btn-primary {
+/* Estrutura das Seções */
+.section-container {
+    padding: 6rem 5%;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.section-header h2 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+}
+
+.section-header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+/* Grid de Funcionalidades */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    background: var(--card-bg);
+    padding: 2.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.03);
+    transition: 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.icon-box {
+    width: 50px;
+    height: 50px;
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--accent-blue);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Grid de Preços */
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.price-card {
+    background: var(--card-bg);
+    padding: 3rem 2rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.03);
+    position: relative;
+    transition: 0.3s;
+}
+
+.price-card.featured {
+    border: 2px solid var(--accent-blue);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.15);
+    padding: 3.5rem 2rem; /* Leve destaque de tamanho */
+}
+
+.card-badge {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
     background: var(--accent-blue);
     color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
+    padding: 0.25rem 1rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.price {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 1.5rem 0 0.5rem;
+}
+
+.price span { font-size: 2rem; }
+.price small { font-size: 1rem; color: var(--text-muted); font-weight: 400; }
+
+.plan-desc {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+
+hr { border: 0; border-top: 1px solid rgba(255,255,255,0.08); margin: 1.5rem 0; }
+
+.plan-features {
+    list-style: none;
+    margin-bottom: 2.5rem;
+}
+
+.plan-features li {
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.plan-features li i {
+    color: #4ade80;
+    margin-right: 10px;
+}
+
+.btn-plan {
+    display: block;
+    text-align: center;
+    background: rgba(255,255,255,0.05);
+    color: var(--text-main);
     text-decoration: none;
+    padding: 0.75rem;
+    border-radius: 8px;
     font-weight: 600;
     transition: 0.3s;
-    border: none;
-    cursor: pointer;
 }
 
-.btn-primary:hover {
-    background: var(--accent-hover);
+.btn-plan:hover {
+    background: rgba(255,255,255,0.1);
 }
 
-/* Seção Hero (Landing Page) */
-.hero {
-    min-height: 80vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+/* Rodapé */
+.main-footer {
     text-align: center;
-    padding: 2rem 5%;
-}
-
-.hero h1 {
-    font-size: 3.5rem;
-    line-height: 1.2;
-    margin-bottom: 1.5rem;
-    max-width: 800px;
-}
-
-.hero p {
-    font-size: 1.2rem;
-    color: var(--text-muted);
-    max-width: 600px;
-    margin-bottom: 2rem;
-}
-
-/* Tela de Login */
-.login-container {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 1rem;
-}
-
-.login-box {
-    background: var(--card-bg);
     padding: 3rem;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 400px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-}
-
-.login-box h2 {
-    margin-bottom: 0.5rem;
-    text-align: center;
-}
-
-.login-box p {
+    border-top: 1px solid rgba(255,255,255,0.03);
     color: var(--text-muted);
-    text-align: center;
-    margin-bottom: 2rem;
 }
 
-.input-group {
-    margin-bottom: 1.5rem;
-}
-
-.input-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 1rem;
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-    outline: none;
-    transition: 0.3s;
-}
-
-.input-group input:focus {
-    border-color: var(--accent-blue);
-}
-
-.login-box .btn-primary {
-    width: 100%;
-    margin-top: 1rem;
-}
-
-/* Responsividade */
+/* Ajustes de Responsividade */
 @media (max-width: 768px) {
+    .nav-links { display: none; } /* Simplifica o menu no mobile */
     .hero h1 { font-size: 2.5rem; }
+    .hero-actions { display: flex; flex-direction: column; gap: 1rem; }
+    .btn-secondary { margin-left: 0; text-align: center; }
 }

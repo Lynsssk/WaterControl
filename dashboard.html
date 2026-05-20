@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel | WaterControl Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Water<span>Control</span></h2>
+            </div>
+            <nav>
+                <a href="#" class="active"><i class="fas fa-chart-line"></i> Monitoramento</a>
+                <a href="#"><i class="fas fa-bell"></i> Alertas</a>
+                <a href="#"><i class="fas fa-history"></i> Histórico</a>
+                <a href="#"><i class="fas fa-cog"></i> Configurações</a>
+                <a href="#" onclick="fazerLogout()" style="color: #ff4d4d; margin-top: 2rem;">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </nav>
+            <div class="user-info">
+                <p>Olá, <strong>Lyne</strong></p>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1>Painel de Controle</h1>
+                <p id="current-date" style="color: var(--text-muted);"></p>
+            </header>
+
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <h3>Nível Atual do Reservatório</h3>
+                    <div class="water-level">
+                        <span id="level-value">--</span>%
+                    </div>
+                    <div class="progress-bar">
+                        <div id="progress-fill" style="width: 0%; background: var(--accent-blue);"></div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Status do Sensor</h3>
+                    <p class="status-online" style="color: #4ade80; font-weight: bold; font-size: 1.2rem; margin-top: 10px;">
+                        <i class="fas fa-wifi"></i> Conectado
+                    </p>
+                    <small style="color: var(--text-muted);">Aguardando dados em tempo real...</small>
+                </div>
+            </section>
+
+            <section class="details-grid">
+                <div class="chart-container bg-glass">
+                    <h3>Histórico de Consumo</h3>
+                    <div style="height: 250px; margin-top: 1rem;">
+                        <canvas id="meuGrafico"></canvas>
+                    </div>
+                </div>
+
+                <div class="alerts-container bg-glass">
+                    <h3>Notificações Inteligentes</h3>
+                    <ul id="alert-list" style="list-style: none; margin-top: 1rem; color: var(--text-muted);">
+                        <li style="margin-bottom: 10px;">
+                            <i class="fas fa-check-circle" style="color: #4ade80;"></i> Sistema iniciado com sucesso.
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <script src="script.js"></script>
+    
+    <script>
+        // Função para atualizar a data no cabeçalho
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').innerText = now.toLocaleDateString('pt-BR', options);
+
+        // Função chamada automaticamente pelo Firebase (no script.js) quando o nível muda
+        function updateWaterLevel(newLevel) {
+            const textValue = document.getElementById('level-value');
+            const progressBar = document.getElementById('progress-fill');
+            const alertList = document.getElementById('alert-list');
+            
+            textValue.innerText = newLevel;
+            progressBar.style.width = newLevel + "%";
+
+            // Lógica de cores e alertas críticos
+            if(newLevel <= 20) {
+                progressBar.style.backgroundColor = "#ff4d4d"; // Vermelho
+                textValue.style.color = "#ff4d4d";
+                
+                // Adiciona notificação de nível baixo
+                const newAlert = document.createElement('li');
+                newAlert.style.marginBottom = "10px";
+                newAlert.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #ff4d4d;"></i> Alerta: Nível crítico detectado (${newLevel}%)`;
+                alertList.prepend(newAlert);
+            } else {
+                progressBar.style.backgroundColor = "#3b82f6"; // Azul
+                textValue.style.color = "#3b82f6";
+            }
+        }
+
+        // Configuração do Gráfico (Chart.js)
+        const ctx = document.getElementById('meuGrafico').getContext('2d');
+        const meuGrafico = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['08:00', '10:00', '12:00', '14:00', 'Agora'],
+                datasets: [{
+                    label: 'Nível da Água (%)',
+                    data: [80, 75, 70, 65, 65], // Valores simulados para layout
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        max: 100,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                },
+                plugins: {
+                    legend: { labels: { color: '#f8fafc' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
