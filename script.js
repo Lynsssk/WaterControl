@@ -68,6 +68,9 @@ if (loginForm) {
 // ==========================================
 
 // Função para mostrar/esconder o CNPJ dependendo do tipo de conta
+// ==========================================
+// 1. LÓGICA DE MOSTRAR/ESCONDER CNPJ
+// ==========================================
 const radiosConta = document.querySelectorAll('input[name="tipoConta"]');
 const cnpjGroup = document.getElementById('cnpj-group');
 
@@ -85,11 +88,16 @@ if (radiosConta.length > 0) {
     });
 }
 
+// ==========================================
+// 2. LÓGICA DE FINALIZAR CADASTRO
+// ==========================================
 const cadastroForm = document.getElementById('cadastro-form');
+
 if (cadastroForm) {
     cadastroForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Isso impede a página de recarregar (o famoso erro do '?')
         
+        // Coleta os dados digitados
         const tipoConta = document.querySelector('input[name="tipoConta"]:checked').value;
         const nome = document.getElementById('nome').value;
         const cnpj = document.getElementById('cnpj').value;
@@ -99,25 +107,25 @@ if (cadastroForm) {
         const password = document.getElementById('password').value;
         const errorMsg = document.getElementById('error-message');
         
+        // Esconde a mensagem de erro toda vez que tenta enviar
         errorMsg.style.display = 'none';
 
-        // --- NOVA TRAVA DE SEGURANÇA (REGEX) ---
-        // Exige: mínimo 8 caracteres, pelo menos 1 letra maiúscula e 1 caractere especial
+        // --- TRAVA DE SEGURANÇA (SENHA FORTE) ---
         const senhaForteRegex = /^(?=.*[A-Z])(?=.*[!@#$&*]).{8,}$/;
         
         if (!senhaForteRegex.test(password)) {
             errorMsg.style.display = 'block';
             errorMsg.innerText = "A senha deve ter no mínimo 8 caracteres, uma letra maiúscula e um símbolo (!@#$&*).";
-            return; // O 'return' cancela o cadastro na hora e nem chama o Firebase
+            return; // Interrompe o processo aqui mesmo
         }
-        // ---------------------------------------
 
-        // 1. Cria a conta de autenticação (só chega aqui se a senha for forte)
-        auth.createUserWithEmailAndPassword(email, password)
+        // --- ENVIANDO PARA O FIREBASE ---
+        firebase.auth().createUserWithEmailAndPassword(email, password)
             .then((userCredential) => {
+                // Conta criada no Auth! Agora vamos salvar os dados no Banco.
                 const usuario = userCredential.user;
-                
                 const database = firebase.database();
+                
                 return database.ref('clientes/' + usuario.uid).set({
                     nome: nome,
                     tipoConta: tipoConta,
@@ -129,12 +137,19 @@ if (cadastroForm) {
                 });
             })
             .then(() => { 
+                // Tudo deu certo
                 alert("Conta criada com sucesso! Bem-vindo ao WaterControl Pro.");
                 window.location.href = "dashboard.html"; 
             })
             .catch((error) => {
+                // Se der erro (ex: email já existe)
                 errorMsg.style.display = 'block';
-                errorMsg.innerText = "Erro ao criar conta: " + error.message;
+                
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMsg.innerText = "Este e-mail já está cadastrado. Faça login.";
+                } else {
+                    errorMsg.innerText = "Erro ao criar conta: " + error.message;
+                }
             });
     });
 }
